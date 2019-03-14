@@ -71,7 +71,7 @@ class Updater:
 @click.option("--organization", type=str, required=True)
 @click.option("--find", type=str, required=True)
 @click.option("--replace", type=str, required=True)
-@click.option("--extra-search-params", type=str)
+@click.option("--extra-search-params", type=str, default="")
 @click.pass_context
 def cli(
     ctx,
@@ -90,7 +90,7 @@ def cli(
     query = f"org:{organization} {extra_search_params} in:file '{find}'"
     results = gh.search_code(query)
 
-    if not results:
+    if not results.totalCount:
         click.echo(f"No results found for:\n{query}")
         return
 
