@@ -68,13 +68,15 @@ class Updater:
 
 
 @click.command()
-@click.option("--organization", type=str, required=True)
-@click.option("--find", type=str, required=True)
-@click.option("--replace", type=str, required=True)
-@click.option("--extra-search-params", type=str, default="")
+@click.option('-h', '--ghe-hostname', type=str, default="", help='Github Enterprise Hostname, example: \'github.company.com\'')
+@click.option('-o', '--organization', type=str, required=True)
+@click.option('-f', '--find', type=str, required=True)
+@click.option('-r', '--replace', type=str, required=True)
+@click.option('-e', '--extra-search-params', type=str, default="")
 @click.pass_context
 def cli(
     ctx,
+    ghe_hostname,
     organization,
     find,
     replace,
@@ -85,7 +87,10 @@ def cli(
     # find = find.replace('\\n', '\n')
     # replace = replace.replace('\\n', '\n')
 
-    gh = github.Github(os.environ["GITHUB_API_TOKEN"])
+    if not ghe_hostname:
+        gh = github.Github(os.environ["GITHUB_API_TOKEN"])
+    else:
+        gh = github.Github(base_url=f"https://{ghe_hostname}/api/v3", login_or_token=os.environ["GITHUB_API_TOKEN"])
 
     query = f"org:{organization} {extra_search_params} in:file '{find}'"
     results = gh.search_code(query)
