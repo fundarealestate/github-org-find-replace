@@ -127,7 +127,11 @@ def cli(
 
     title = click.prompt("Commit message / PR title")
     branch_name = click.prompt("Branch name")
-    labels = [x.strip() for x in click.prompt("PR labels", default="").split(",")]
+    labels_in_commas = click.prompt("PR labels", default="")
+    labels = []
+
+    if labels_in_commas:
+        labels = [x.strip() for x in labels_in_commas.split(",")]
 
     for u in updaters:
         click.secho(str(u.repo), fg="magenta")
