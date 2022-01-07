@@ -73,6 +73,7 @@ class Updater:
 @click.option('-f', '--find', type=str, required=True)
 @click.option('-r', '--replace', type=str, required=True)
 @click.option('-e', '--extra-search-params', type=str, default="")
+@click.option('-i', '--ignore-existing-branch', is_flag=True, default=False)
 @click.pass_context
 def cli(
     ctx,
@@ -81,6 +82,7 @@ def cli(
     find,
     replace,
     extra_search_params,
+    ignore_existing_branch
 ):
 
     # allow \n to be given on the command line user input
@@ -135,7 +137,13 @@ def cli(
 
     for u in updaters:
         click.secho(str(u.repo), fg="magenta")
-        u.create_pr(title, branch_name, labels)
+        try:
+            u.create_pr(title, branch_name, labels)
+        except github.GithubException as err:
+            if ignore_existing_branch and err.status == 422:
+                print(f"Branch already exists on {u.repo}, ignoring it")
+            else:
+                raise err
 
 
 if __name__ == "__main__":
