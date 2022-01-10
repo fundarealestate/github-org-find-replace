@@ -167,9 +167,10 @@ def cli(
         try:
             u.create_pr(title, branch_name, labels_list, reviewers_list)
         except github.GithubException as err:
-            if ignore_existing_branch and err.status == 422:
+            if ignore_existing_branch and err.status == 422 and err.message == 'Reference already exists':
                 print(f"Branch already exists on {u.repo}, ignoring it")
             else:
+                print("An error has ocurred. Some pull requests may have still been created.")
                 raise err
 
 
