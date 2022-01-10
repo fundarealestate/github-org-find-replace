@@ -104,6 +104,9 @@ def cli(
     else:
         gh = github.Github(base_url=f"https://{ghe_hostname}/api/v3", login_or_token=os.environ["GITHUB_API_TOKEN"])
 
+    if not match_string:
+        match_string = find
+
     query = f"org:{organization} {extra_search_params} in:file '{find}'"
     results = gh.search_code(query)
 
