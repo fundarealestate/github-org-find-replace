@@ -16,7 +16,6 @@ class Updater:
     def get_old_contents(self):
         for p in self.paths:
             # get the current content from master
-            print(p)
             f = self.repo.get_file_contents(p)
             self.old_contents[p] = f.decoded_content.decode("utf-8")
             self.old_shas[p] = f.sha
