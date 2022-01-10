@@ -84,10 +84,10 @@ class Updater:
 @click.option('-x', '--regex', required=False, is_flag=True, default=False, help='Activate regex mode over match-string/replace pair.')
 @click.option('-e', '--extra-search-params', type=str, default="")
 @click.option('-i', '--ignore-existing-branch', is_flag=True, default=False)
-@click.option('--commit-msg', type=str, help='Set the commit/PR message ahead of prompt. Can still be overridden by the prompt.')
-@click.option('--branch', type=str, help='Set the branch name ahead of prompt. Can still be overridden by the prompt.')
-@click.option('--labels', type=str, help='Set the PR labels ahead of prompt. Can still be overridden by the prompt.')
-@click.option('--reviewers', type=str, help='Set the PR reviewers ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--commit-msg', type=str, default="", help='Set the commit/PR message ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--branch', type=str, default="", help='Set the branch name ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--labels', type=str, default="", help='Set the PR labels ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--reviewers', type=str, default="", help='Set the PR reviewers ahead of prompt. Can still be overridden by the prompt.')
 @click.pass_context
 def cli(
     ctx,
