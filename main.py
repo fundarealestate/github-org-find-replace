@@ -21,12 +21,12 @@ class Updater:
             self.old_contents[p] = f.decoded_content.decode("utf-8")
             self.old_shas[p] = f.sha
 
-    def find_replace(self, find_file, replace, regex=False):
+    def find_replace(self, match_string, replace, regex=False):
         for p, old_content in self.old_contents.items():
             if regex:
-                new_content = re.sub(find_file, replace, old_content)
+                new_content = re.sub(match_string, replace, old_content)
             else:
-                new_content = old_content.replace(find_file, replace)
+                new_content = old_content.replace(match_string, replace)
 
             if new_content == old_content:
                 print("(no change in content)")
@@ -77,9 +77,9 @@ class Updater:
 @click.option('-h', '--ghe-hostname', type=str, default="", help='Github Enterprise Hostname, example: \'github.company.com\'')
 @click.option('-o', '--organization', type=str, required=True)
 @click.option('-f', '--find', type=str, required=True, help='The string that is going to be searched in GH.')
-@click.option('-g', '--find_file', type=str, required=True, help='The string or regex pattern that is going to be replaced inside the matching files.')
+@click.option('-s', '--match-string', type=str, required=False, help='Optional string or regex pattern that is going to be replaced inside the matching files instead of --find')
 @click.option('-r', '--replace', type=str, required=True, help='The string or regex pattern to substitute the matched pattern. (regex can be used to put back capture groups i.e. \\1, \\2).')
-@click.option('-x', '--regex', type=bool, required=False, default=False, is_flag=True, help='Wether any of the file_find or replace arguments is to be interpreted as regex.')
+@click.option('-x', '--regex', required=False, is_flag=True, default=False, help='Activate regex mode over match-string/replace pair.')
 @click.option('-e', '--extra-search-params', type=str, default="")
 @click.option('-i', '--ignore-existing-branch', is_flag=True, default=False)
 @click.pass_context
@@ -88,7 +88,7 @@ def cli(
     ghe_hostname,
     organization,
     find,
-    find_file,
+    match_string,
     replace,
     regex,
     extra_search_params,
@@ -132,7 +132,7 @@ def cli(
     for u in updaters:
         click.secho(str(u.repo), fg="magenta")
         u.get_old_contents()
-        u.find_replace(find_file, replace, regex)
+        u.find_replace(match_string, replace, regex)
 
     if not click.confirm("Ready to send these as PRs? We'll get some more information first."):
         return
