@@ -39,7 +39,7 @@ class Updater:
             print(new_content)
             print("---------")
 
-    def create_pr(self, message, branch_name, labels):
+    def create_pr(self, message, branch_name, labels, reviewers):
         if not self.new_contents:
             print("no new contents to use")
             return
@@ -68,6 +68,9 @@ class Updater:
 
         if labels:
             pull.add_to_labels(*labels)
+
+        if reviewers:
+            pull.create_review_request(reviewers)
 
         print(pull.html_url)
 
@@ -141,16 +144,20 @@ def cli(
 
     title = click.prompt("Commit message / PR title")
     branch_name = click.prompt("Branch name")
-    labels_in_commas = click.prompt("PR labels", default="")
+    labels_in_commas = click.prompt("PR labels, comma separated", default="")
     labels = []
+    reviewers_in_commas = click.prompt("PR reviewers (not teams), comma separated", default="")
+    reviewers = []
 
     if labels_in_commas:
         labels = [x.strip() for x in labels_in_commas.split(",")]
+    if reviewers_in_commas:
+        reviewers = [x.strip() for x in reviewers_in_commas.split(",")]
 
     for u in updaters:
         click.secho(str(u.repo), fg="magenta")
         try:
-            u.create_pr(title, branch_name, labels)
+            u.create_pr(title, branch_name, labels, reviewers)
         except github.GithubException as err:
             if ignore_existing_branch and err.status == 422:
                 print(f"Branch already exists on {u.repo}, ignoring it")
