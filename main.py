@@ -84,6 +84,10 @@ class Updater:
 @click.option('-x', '--regex', required=False, is_flag=True, default=False, help='Activate regex mode over match-string/replace pair.')
 @click.option('-e', '--extra-search-params', type=str, default="")
 @click.option('-i', '--ignore-existing-branch', is_flag=True, default=False)
+@click.option('--commit-msg', type=str, help='Set the commit/PR message ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--branch', type=str, help='Set the branch name ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--labels', type=str, help='Set the PR labels ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--reviewers', type=str, help='Set the PR reviewers ahead of prompt. Can still be overridden by the prompt.')
 @click.pass_context
 def cli(
     ctx,
@@ -94,6 +98,10 @@ def cli(
     replace,
     regex,
     extra_search_params,
+    commit_msg,
+    branch,
+    labels,
+    reviewers,
     ignore_existing_branch
 ):
 
@@ -142,22 +150,22 @@ def cli(
     if not click.confirm("Ready to send these as PRs? We'll get some more information first."):
         return
 
-    title = click.prompt("Commit message / PR title")
-    branch_name = click.prompt("Branch name")
-    labels_in_commas = click.prompt("PR labels, comma separated", default="")
-    labels = []
-    reviewers_in_commas = click.prompt("PR reviewers (not teams), comma separated", default="")
-    reviewers = []
+    title = click.prompt("Commit message / PR title", default=commit_msg)
+    branch_name = click.prompt("Branch name", default=branch)
+    labels_in_commas = click.prompt("PR labels, comma separated", default=labels)
+    labels_list = []
+    reviewers_in_commas = click.prompt("PR reviewers (not teams), comma separated", default=reviewers)
+    reviewers_list = []
 
     if labels_in_commas:
-        labels = [x.strip() for x in labels_in_commas.split(",")]
+        labels_list = [x.strip() for x in labels_in_commas.split(",")]
     if reviewers_in_commas:
-        reviewers = [x.strip() for x in reviewers_in_commas.split(",")]
+        reviewers_list = [x.strip() for x in reviewers_in_commas.split(",")]
 
     for u in updaters:
         click.secho(str(u.repo), fg="magenta")
         try:
-            u.create_pr(title, branch_name, labels, reviewers)
+            u.create_pr(title, branch_name, labels_list, reviewers_list)
         except github.GithubException as err:
             if ignore_existing_branch and err.status == 422:
                 print(f"Branch already exists on {u.repo}, ignoring it")
