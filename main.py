@@ -86,8 +86,8 @@ class Updater:
 @click.option('-i', '--ignore-existing-branch', is_flag=True, default=False)
 @click.option('--commit-msg', type=str, default="", help='Set the commit/PR message ahead of prompt. Can still be overridden by the prompt.')
 @click.option('--branch', type=str, default="", help='Set the branch name ahead of prompt. Can still be overridden by the prompt.')
-@click.option('--labels', type=str, default="", help='Set the PR labels ahead of prompt. Can still be overridden by the prompt.')
-@click.option('--reviewers', type=str, default="", help='Set the PR reviewers ahead of prompt. Can still be overridden by the prompt.')
+@click.option('--labels', type=str, default="", help='Set the PR labels ahead of prompt. Can still be overridden by the prompt. Comma separated list.')
+@click.option('--reviewers', type=str, default="", help='Set the PR reviewers ahead of prompt. Can still be overridden by the prompt. Comma separated list.')
 @click.pass_context
 def cli(
     ctx,
