@@ -1,5 +1,6 @@
 import os
 import re
+import time
 
 import github
 import click
@@ -16,7 +17,7 @@ class Updater:
     def get_old_contents(self):
         for p in self.paths:
             # get the current content from master
-            f = self.repo.get_file_contents(p)
+            f = self.repo.get_contents(p)
             self.old_contents[p] = f.decoded_content.decode("utf-8")
             self.old_shas[p] = f.sha
 
@@ -50,7 +51,7 @@ class Updater:
         )
 
         for p, new_content in self.new_contents.items():
-            old_file_sha = self.repo.get_file_contents(p, ref.ref).sha
+            old_file_sha = self.repo.get_contents(p, ref.ref).sha
             self.repo.update_file(
                 p,
                 message,
@@ -118,6 +119,7 @@ def cli(
         match_string = find
 
     query = f"org:{organization} {extra_search_params} in:file '{find}'"
+    print(query)
     results = gh.search_code(query)
 
     if not results.totalCount:
@@ -133,6 +135,7 @@ def cli(
             continue
 
         files_in_repo = repo_files.get(result.repository.full_name, [])
+        time.sleep(1)
         files_in_repo.append(result.path)
         repo_files[result.repository.full_name] = files_in_repo
 
@@ -145,6 +148,7 @@ def cli(
     for u in updaters:
         click.secho(str(u.repo), fg="magenta")
         u.get_old_contents()
+        time.sleep(2)
         u.find_replace(match_string, replace, regex)
 
     if not click.confirm("Ready to send these as PRs? We'll get some more information first."):
@@ -166,9 +170,11 @@ def cli(
         click.secho(str(u.repo), fg="magenta")
         try:
             u.create_pr(title, branch_name, labels_list, reviewers_list)
+            time.sleep(2)
         except github.GithubException as err:
             if ignore_existing_branch and err.status == 422 and err.data['message'] == 'Reference already exists':
                 print(f"Branch already exists on {u.repo}, ignoring it")
+                continue
             else:
                 print("An error has ocurred. Some pull requests may have still been created.")
                 raise err
