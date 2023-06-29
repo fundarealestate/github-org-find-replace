@@ -118,7 +118,8 @@ def cli(
     if not match_string:
         match_string = find
 
-    query = f"org:{organization} {extra_search_params} in:file '{find}'"
+    #query = f"org:{organization} {extra_search_params} in:file '{find}'"
+    query = f"org:{organization} {extra_search_params} {find}"
     print(query)
     results = gh.search_code(query)
 
