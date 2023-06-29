@@ -1,1 +1,18 @@
- python3.7 main.py 
+have python 3.7 installed : $ brew install python@3.7
+
+install pip : $ python -m ensurepip --upgrade
+              in case that fails, use : $ python3.7 get-pip.py
+
+create a classic token here : https://github.com/settings/tokens with these rights:
+read:audit_log, read:discussion, read:enterprise, read:gpg_key, read:org, read:project, read:public_key, read:repo_hook, read:ssh_signing_key, read:user, repo, user:email, workflow, write:packages
+Click Configure SSO and enable approval for fundarealestate
+
+set the token as an environment variable:
+$ export GITHUB_API_TOKEN=ghp_...
+
+now you can run the tool
+
+$ python3.7 main.py --help
+
+example (the -f value is case sensitive!)
+$ python3.7 main.py -o fundarealestate -f '"HostName": "FRE-03-010.funda.nl"' -r '"HostName": "datadog-statsd.default"' --branch SRE-6976 --labels SRE-6976 --commit-msg "[SRE-6976] please use correct statsd hostname after migrating from DCOS"
